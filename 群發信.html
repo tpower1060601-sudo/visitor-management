@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>群發信 - 親家市政廣場</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:linear-gradient(135deg,#f0f4ff 0%,#e8edf5 100%);color:#1e293b;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:24px}
+.card{background:rgba(255,255,255,.95);border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.06);padding:24px;margin-bottom:16px;border:1px solid rgba(255,255,255,.6)}
+h1{font-size:22px;font-weight:800;letter-spacing:-.3px;color:#0f172a;display:flex;align-items:center;gap:10px}
+h2{font-size:14px;font-weight:700;color:#1e40af;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+h2::before{content:'';display:inline-block;width:3px;height:14px;background:linear-gradient(180deg,#3b82f6,#6366f1);border-radius:2px}
+
+label{display:block;font-size:11px;font-weight:600;color:#475569;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px}
+input,textarea{width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:14px;transition:all .2s;background:#fff;font-family:inherit;color:#1e293b}
+input:focus,textarea:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 4px rgba(99,102,241,.1)}
+textarea{resize:vertical;min-height:80px;line-height:1.5}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-primary{background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(99,102,241,.35)}
+.btn-green{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff}
+.btn-green:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(22,163,74,.35)}
+.btn-ghost{border:1.5px solid #e2e8f0;background:#fff;color:#64748b}
+.btn-ghost:hover{border-color:#6366f1;color:#6366f1;background:#eef2ff}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:6px}
+.btn-full{width:100%;padding:12px;font-size:15px}
+
+.email-list{max-height:360px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:9px}
+.email-row{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid #f1f5f9;font-size:13px;cursor:pointer;transition:background .1s}
+.email-row:hover{background:#f8fafc}
+.email-row input[type=checkbox]{width:16px;height:16px;cursor:pointer;flex-shrink:0}
+.email-row .email{flex:1;color:#1e293b}
+.email-row .name{color:#64748b;font-size:12px;margin-left:4px}
+.email-row .tag{font-size:10px;padding:1px 6px;border-radius:6px;background:#dbeafe;color:#1e40af;flex-shrink:0}
+.company-header{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:12px;font-weight:600;color:#475569;cursor:pointer}
+.company-header input{margin:0;transform:scale(.85)}
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.stat{background:#f1f5f9;padding:4px 12px;border-radius:7px;font-size:12px;font-weight:600;color:#475569}
+.stat span{color:#1e40af}
+
+.hidden{display:none!important}
+.char-count{font-size:11px;color:#94a3b8;text-align:right;margin-top:4px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <h1>📧 群發信 - 親家市政廣場</h1>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+      <h2 style="margin-bottom:0">收件人（BCC 密件副本）</h2>
+      <div class="actions">
+        <button class="btn btn-ghost btn-sm" id="selectAll">全選</button>
+        <button class="btn btn-ghost btn-sm" id="deselectAll">取消全選</button>
+        <button class="btn btn-ghost btn-sm" id="copyEmails">📋 複製 Email</button>
+      </div>
+    </div>
+    <div id="stats" class="stats"><div class="stat">載入中...</div></div>
+    <div id="loadingEl" style="text-align:center;padding:20px;color:#94a3b8;font-size:13px">載入人員名單中...</div>
+    <div id="emailList" class="email-list hidden"></div>
+  </div>
+
+  <div class="card">
+    <h2>信件內容</h2>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <label>主旨</label>
+        <input type="text" id="subject" placeholder="請輸入信件主旨">
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <label>內文</label>
+        <span id="charCount" class="char-count">0 字</span>
+      </div>
+      <textarea id="body" placeholder="請輸入信件內文..."></textarea>
+    </div>
+  </div>
+
+  <div class="card" style="text-align:center">
+    <button class="btn btn-green btn-full" id="sendBtn">🚀 用 Gmail 開啟發信</button>
+    <p style="font-size:11px;color:#94a3b8;margin-top:8px">會在新分頁開啟 Gmail，收件人自動帶入 BCC（密件副本）</p>
+    <div id="countWarning" style="font-size:12px;color:#ef4444;margin-top:4px;display:none">⚠ 人數過多，可能超出 mailto 字數限制，建議分批發送</div>
+  </div>
+</div>
+
+<script>
+const API='https://vas-api.pss-group-prod.com/vas-pss/api/v1';
+const BLD='IC0481';
+let allStaff=[], grouped={};
+
+async function init(){
+  try{
+    const g=await (await fetch(`${API}/vas/guest`)).json();
+    const d=await (await fetch(`${API}/vas/company-staff/query`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${g.AccessToken}`},body:JSON.stringify({BuildingNo:BLD})})).json();
+    allStaff=(d.DataList||[]).filter(s=>s.username&&s.username.includes('@'));
+    // De-duplicate by username
+    const seen=new Set(); allStaff=allStaff.filter(s=>{if(seen.has(s.username))return false; seen.add(s.username); return true;});
+    // Group by EnterpriseId
+    grouped={};
+    for(const s of allStaff){ const eid=s.EnterpriseId||'other'; if(!grouped[eid]) grouped[eid]=[]; grouped[eid].push(s); }
+    renderList();
+  }catch(e){ document.getElementById('emailList').innerHTML=`<div style="padding:20px;color:#ef4444">載入失敗：${e.message}</div>`; }
+  document.getElementById('loadingEl').classList.add('hidden');
+  document.getElementById('emailList').classList.remove('hidden');
+}
+
+function renderList(){
+  const el=document.getElementById('emailList');
+  let html='';
+  for(const[eid,staff]of Object.entries(grouped).sort()){
+    html+=`<div class="company-header" data-eid="${eid}"><input type="checkbox" class="co-check" data-eid="${eid}" checked onchange="toggleCompany('${eid}',this.checked)"> ${eid}（${staff.length}人）</div>`;
+    for(const s of staff){
+      html+=`<div class="email-row" data-eid="${eid}">
+        <input type="checkbox" class="email-check" value="${escHtml(s.username)}" data-eid="${eid}" checked onchange="updateStats()">
+        <span class="email">${escHtml(s.username)}</span>
+        <span class="name">${escHtml(s.display_name)}</span>
+        <span class="tag">${s.EnterpriseId}</span>
+      </div>`;
+    }
+  }
+  el.innerHTML=html;
+  updateStats();
+}
+
+function toggleCompany(eid,checked){
+  document.querySelectorAll(`.email-check[data-eid="${eid}"]`).forEach(cb=>{cb.checked=checked;});
+  updateStats();
+}
+
+function updateStats(){
+  const total=allStaff.length;
+  const selected=document.querySelectorAll('.email-check:checked').length;
+  document.getElementById('stats').innerHTML=`
+    <div class="stat">總共 <span>${total}</span> 人</div>
+    <div class="stat">已選 <span id="selCount">${selected}</span> 人</div>
+    <div class="stat">公司 <span>${Object.keys(grouped).length}</span> 間</div>
+  `;
+  updateCompanyChecks();
+}
+
+function updateCompanyChecks(){
+  document.querySelectorAll('.co-check').forEach(cb=>{
+    const eid=cb.dataset.eid;
+    const total=document.querySelectorAll(`.email-check[data-eid="${eid}"]`).length;
+    const checked=document.querySelectorAll(`.email-check[data-eid="${eid}"]:checked`).length;
+    cb.checked=checked>0; cb.indeterminate=checked>0&&checked<total;
+  });
+}
+
+document.getElementById('selectAll').addEventListener('click',()=>{
+  document.querySelectorAll('.email-check,.co-check').forEach(cb=>{cb.checked=true; cb.indeterminate=false;});
+  updateStats();
+});
+document.getElementById('deselectAll').addEventListener('click',()=>{
+  document.querySelectorAll('.email-check,.co-check').forEach(cb=>{cb.checked=false; cb.indeterminate=false;});
+  updateStats();
+});
+
+document.getElementById('copyEmails').addEventListener('click',()=>{
+  const emails=Array.from(document.querySelectorAll('.email-check:checked')).map(cb=>cb.value);
+  if(!emails.length){ alert('請先選取收件人'); return; }
+  navigator.clipboard.writeText(emails.join('; ')).then(()=>alert(`已複製 ${emails.length} 個 Email`));
+});
+
+document.getElementById('body').addEventListener('input',function(){
+  document.getElementById('charCount').textContent=this.value.length+' 字';
+});
+
+document.getElementById('sendBtn').addEventListener('click',()=>{
+  const emails=Array.from(document.querySelectorAll('.email-check:checked')).map(cb=>cb.value);
+  if(!emails.length){ alert('請先選取收件人'); return; }
+  const subject=document.getElementById('subject').value.trim()||'(無主旨)';
+  const body=document.getElementById('body').value.trim();
+  const bcc=emails.join(',');
+  if(bcc.length>1500) document.getElementById('countWarning').style.display='block';
+  else document.getElementById('countWarning').style.display='none';
+  const url='https://mail.google.com/mail/?view=cm&bcc='+encodeURIComponent(bcc)+'&su='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  window.open(url,'_blank');
+});
+
+function escHtml(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+init();
+</script>
+</body>
+</html>
