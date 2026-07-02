@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>後台管理 - 親家市政廣場</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:linear-gradient(135deg,#f0f4ff 0%,#e8edf5 100%);color:#1e293b;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:24px}
+.card{background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.06);padding:28px;margin-bottom:20px;border:1px solid rgba(255,255,255,.6);animation:fadeIn .35s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Login */
+.login-wrapper{max-width:400px;margin:60px auto;text-align:center}
+.login-wrapper h1{font-size:26px;margin-bottom:4px}
+.login-logo{width:56px;height:56px;margin:0 auto 16px;background:linear-gradient(135deg,#1e40af,#3730a3);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;box-shadow:0 4px 12px rgba(55,48,163,.3)}
+.subtitle{font-size:14px;color:#64748b;margin-bottom:24px}
+.form-group{margin-bottom:14px;text-align:left}
+label{display:block;font-size:12px;font-weight:600;color:#475569;margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
+label .req{color:#ef4444}
+input,select,textarea{width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;transition:all .2s;background:#fff;font-family:inherit;color:#1e293b}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 4px rgba(99,102,241,.12)}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;cursor:pointer}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.3px}
+.btn-primary{background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(99,102,241,.35)}
+.btn-danger{background:#fee2e2;color:#991b1b}
+.btn-danger:hover{background:#fecaca}
+.btn-ghost{border:1.5px solid #e2e8f0;background:#fff;color:#64748b}
+.btn-ghost:hover{border-color:#6366f1;color:#6366f1;background:#eef2ff}
+.btn-sm{padding:5px 10px;font-size:12px;border-radius:7px}
+
+/* Header */
+.header-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.header-left{display:flex;flex-direction:column;gap:2px}
+.header-left h1{font-size:20px;font-weight:800;letter-spacing:-.3px}
+.building-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#1e40af,#3730a3);color:#fff;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600}
+.header-right{display:flex;align-items:center;gap:10px}
+.user-badge{display:flex;align-items:center;gap:8px;padding:6px 14px 6px 10px;background:#f1f5f9;border-radius:10px;font-size:13px;color:#475569}
+.user-avatar{width:28px;height:28px;background:linear-gradient(135deg,#3b82f6,#6366f1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:20px;background:#f1f5f9;padding:4px;border-radius:12px}
+.tab{padding:10px 20px;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;color:#64748b;background:transparent}
+.tab.active{background:#fff;color:#1e40af;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.tab:hover:not(.active){color:#1e40af}
+
+/* Tables */
+.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid #e2e8f0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f8fafc;padding:10px 12px;text-align:left;font-weight:600;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #e2e8f0;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f8fafc}
+
+/* Section header */
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.section-header h2{font-size:16px;font-weight:700;color:#1e40af;display:flex;align-items:center;gap:8px}
+.section-header h2::before{content:'';display:inline-block;width:3px;height:16px;background:linear-gradient(180deg,#3b82f6,#6366f1);border-radius:2px}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:100;animation:fadeIn .2s}
+.modal{background:#fff;border-radius:16px;padding:28px;max-width:540px;width:90%;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.modal h3{font-size:18px;font-weight:700;margin-bottom:20px}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.modal-row{display:flex;gap:10px}
+.modal-row .form-group{flex:1;min-width:0}
+
+/* Inline form */
+.inline-row{display:flex;gap:8px;align-items:flex-end}
+.inline-row .form-group{flex:1;min-width:0;margin-bottom:0}
+
+/* Badges */
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.badge-blue{background:#dbeafe;color:#1e40af}
+.badge-green{background:#dcfce7;color:#166534}
+.badge-red{background:#fee2e2;color:#991b1b}
+
+/* Loading */
+.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,.8);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:999;font-size:15px;color:#475569}
+.spinner{width:36px;height:36px;border:3px solid #e2e8f0;border-top-color:#6366f1;border-radius:50%;animation:spin .7s linear infinite;margin-right:14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
+.error-msg{color:#ef4444;font-size:13px;padding:8px 12px;background:#fef2f2;border-radius:8px;display:none}
+.error-msg:not(.hidden){display:block}
+.success-msg{color:#16a34a;font-size:13px;padding:8px 12px;background:#f0fdf4;border-radius:8px;display:none}
+.success-msg:not(.hidden){display:block}
+.empty-state{text-align:center;padding:48px 20px;color:#94a3b8;font-size:14px}
+
+@media(max-width:768px){.container{padding:16px}.card{padding:20px}.modal-row{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="container" id="app">
+  <!-- Login -->
+  <div id="loginSection" class="card login-wrapper">
+    <div class="login-logo">⚙️</div>
+    <h1>後台管理系統</h1>
+    <p class="subtitle">親家市政廣場 · IC0481</p>
+    <div class="form-group"><label>帳號</label><input type="text" id="username" value="PSSIC0481@gmail.com"></div>
+    <div class="form-group"><label>密碼</label><input type="password" id="password" value="PSSIC0481"></div>
+    <div id="loginError" class="error-msg hidden"></div>
+    <button id="loginBtn" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px">登入</button>
+  </div>
+
+  <!-- Main -->
+  <div id="mainSection" class="hidden">
+    <!-- Header -->
+    <div class="card" style="padding:20px 28px">
+      <div class="header-bar">
+        <div class="header-left">
+          <h1>後台管理</h1>
+          <span class="building-badge">📍 親家市政廣場 · IC0481</span>
+        </div>
+        <div class="header-right">
+          <div class="user-badge"><span class="user-avatar" id="userAvatar"></span><span id="userDisplay"></span></div>
+          <button class="btn btn-ghost btn-sm" id="logoutBtn">登出</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="card" style="padding:12px 16px">
+      <div class="tabs">
+        <button class="tab" data-tab="companies">🏢 公司管理</button>
+        <button class="tab" data-tab="cards">💳 卡片管理</button>
+        <button class="tab" data-tab="staff">👥 人員管理</button>
+        <button class="tab active" data-tab="access">🔐 門禁群組</button>
+      </div>
+    </div>
+
+    <!-- Tab: Companies -->
+    <div id="tab-companies" class="tab-content hidden">
+      <div class="card">
+        <div class="section-header">
+          <h2>公司列表</h2>
+          <button class="btn btn-primary btn-sm" id="addCompanyBtn">＋ 新增公司</button>
+        </div>
+        <div id="companiesLoading" class="hidden" style="text-align:center;padding:20px;color:#718096">載入中...</div>
+        <div id="companiesContent"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Cards -->
+    <div id="tab-cards" class="tab-content hidden">
+      <div class="card">
+        <div class="section-header">
+          <h2>卡片管理</h2>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="cardCompanySelect" style="width:auto;min-width:200px"><option value="">請先選擇公司</option></select>
+            <button class="btn btn-primary btn-sm" id="addCardBtn">＋ 新增卡片</button>
+          </div>
+        </div>
+        <div id="cardsLoading" class="hidden" style="text-align:center;padding:20px;color:#718096">載入中...</div>
+        <div id="cardsContent"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Staff -->
+    <div id="tab-staff" class="tab-content hidden">
+      <div class="card">
+        <div class="section-header">
+          <h2>人員管理（受訪人／審核人）</h2>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="staffCompanySelect" style="width:auto;min-width:200px"><option value="">請先選擇公司</option></select>
+            <button class="btn btn-primary btn-sm" id="addStaffBtn">＋ 新增人員</button>
+          </div>
+        </div>
+        <div id="staffLoading" class="hidden" style="text-align:center;padding:20px;color:#718096">載入中...</div>
+        <div id="staffContent"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Access Control -->
+    <div id="tab-access" class="tab-content">
+      <div class="card">
+        <div class="section-header">
+          <h2>門禁群組設定</h2>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="accessCompanySelect" style="width:auto;min-width:200px"><option value="">請先選擇公司</option></select>
+          </div>
+        </div>
+        <div id="accessLoading" class="hidden" style="text-align:center;padding:20px;color:#718096">載入中...</div>
+        <div id="accessContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div id="loadingOverlay" class="loading-overlay hidden">
+    <div class="spinner"></div>
+    <span id="loadingText">處理中...</span>
+  </div>
+</div>
+
+<script>
+const API_BASE = 'https://vas-api.pss-group-prod.com/vas-pss/api/v1';
+const BUILDING_NO = 'IC0481';
+let authToken = null, authUser = null, companies = [], currentTab = 'access';
+
+const $ = id => document.getElementById(id);
+function showLoading(msg='處理中...'){ $('loadingText').textContent=msg; $('loadingOverlay').classList.remove('hidden'); }
+function hideLoading(){ $('loadingOverlay').classList.add('hidden'); }
+function showError(el,msg){ el.textContent=msg; el.classList.remove('hidden'); }
+function hideError(el){ el.classList.add('hidden'); }
+function esc(s){ if(!s)return''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+async function apiFetch(path, options={}) {
+  const res = await fetch(`${API_BASE}/${path}`,{
+    ...options,
+    headers:{'Content-Type':'application/json',Authorization:`Bearer ${authToken}`,...(options.headers||{})}
+  });
+  const data = await res.json();
+  if(!res.ok) throw new Error(data.ReturnMsg||`HTTP ${res.status}`);
+  return data;
+}
+
+// ========== Login ==========
+$('loginBtn').addEventListener('click', async () => {
+  const username = $('username').value.trim(), password = $('password').value.trim();
+  hideError($('loginError'));
+  if(!username||!password){ showError($('loginError'),'請輸入帳號密碼'); return; }
+  showLoading('登入中...');
+  try {
+    const data = await apiFetch('vas/login',{method:'POST',body:JSON.stringify({username,password})});
+    if(data.ReturnCode!=='0'){ showError($('loginError'),data.ReturnMsg||'登入失敗'); hideLoading(); return; }
+    authToken = data.token;
+    authUser = {username:data.username,displayName:data.display_name,isAdmin:data.is_admin,roles:data.roles||[]};
+    hideLoading();
+    $('loginSection').classList.add('hidden');
+    $('mainSection').classList.remove('hidden');
+    $('userDisplay').textContent = authUser.displayName;
+    $('userAvatar').textContent = authUser.displayName.charAt(0).toUpperCase();
+    await loadCompanies();
+    switchTab('access');
+  } catch(e){ hideLoading(); showError($('loginError'),'登入失敗：'+e.message); }
+});
+$('password').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginBtn').click()});
+$('logoutBtn').addEventListener('click',()=>{ authToken=null; authUser=null; companies=[]; $('mainSection').classList.add('hidden'); $('loginSection').classList.remove('hidden'); });
+
+// ========== Tabs ==========
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>switchTab(t.dataset.tab)));
+function switchTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.add('hidden'));
+  $(`tab-${tab}`).classList.remove('hidden');
+  if(tab==='companies') renderCompanies();
+  else if(tab==='cards'){ $(`tab-${tab}`).classList.remove('hidden'); populateCompanySelects(); renderCards(); }
+  else if(tab==='staff'){ $(`tab-${tab}`).classList.remove('hidden'); populateCompanySelects(); renderStaff(); }
+  else if(tab==='access'){ $(`tab-${tab}`).classList.remove('hidden'); populateCompanySelects(); renderAccess(); }
+}
+
+function populateCompanySelects(){
+  const opts = '<option value="">請先選擇公司</option>'+companies.map(c=>`<option value="${c.EnterpriseId}">${c.EnterpriseChName}${c.EnterpriseEnName?' ('+c.EnterpriseEnName+')':''}</option>`).join('');
+  ['cardCompanySelect','staffCompanySelect','accessCompanySelect'].forEach(id=>{
+    if($(id)){
+      const v=$(id).value||(companies[companies.length-1]?.EnterpriseId||'');
+      $(id).innerHTML=opts; $(id).value=v;
+    }
+  });
+}
+
+// ========== Companies ==========
+async function loadCompanies(){
+  $('companiesLoading').classList.remove('hidden');
+  try{
+    const data = await apiFetch('vas/enterprise-data/query',{method:'POST',body:JSON.stringify({BuildingNo:BUILDING_NO})});
+    companies = (data.DataList||[]).filter(c=>c.EnterpriseId!=='00000000');
+    companies.forEach(c=>{ c.cardCount = '-'; });
+    renderCompanies();
+    // Load card counts in background
+    loadCardCounts();
+  } catch(e){ companies=[]; }
+  $('companiesLoading').classList.add('hidden');
+}
+
+async function loadCardCounts(){
+  const list = companies; // snapshot to avoid race
+  for(let i=0;i<list.length;i+=3){
+    const batch=list.slice(i,i+3);
+    await Promise.all(batch.map(async c=>{
+      try{
+        const cd=await apiFetch('vas/company-card/query',{method:'POST',body:JSON.stringify({BuildingNo:BUILDING_NO,EnterpriseId:c.EnterpriseId})});
+        c.cardCount=(cd.DataList||[]).length;
+        // Update just the count in DOM, don't re-render whole table
+        const td=document.querySelector(`td[data-eid="${c.EnterpriseId}"]`);
+        if(td) td.innerHTML=`<span class="badge badge-blue">${c.cardCount}</span>`;
+      } catch(e){ c.cardCount='?'; }
+    }));
+  }
+}
+
+function renderCompanies(){
+  const el = $('companiesContent');
+  if(!companies.length){ el.innerHTML='<div class="empty-state">尚無公司資料</div>'; return; }
+  el.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>公司編號</th><th>中文名稱</th><th>英文名稱</th><th>電話</th><th>卡片數</th><th>操作</th></tr></thead>
+    <tbody>${companies.map(c=>`<tr>
+      <td>${c.EnterpriseId}</td><td>${esc(c.EnterpriseChName)}</td><td>${esc(c.EnterpriseEnName||'')}</td><td>${esc(c.Telphone||'')}</td>
+      <td data-eid="${c.EnterpriseId}"><span class="badge badge-blue">${c.cardCount||'-'}</span></td>
+      <td style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm edit-company" data-eid="${c.EnterpriseId}">編輯</button>
+        <button class="btn btn-danger btn-sm delete-company" data-eid="${c.EnterpriseId}" data-name="${esc(c.EnterpriseChName)}">刪除</button>
+      </td>
+    </tr>`).join('')}
+    </tbody></table></div>`;
+  el.querySelectorAll('.edit-company').forEach(b=>b.addEventListener('click',()=>openEditCompany(b.dataset.eid)));
+  el.querySelectorAll('.delete-company').forEach(b=>b.addEventListener('click',()=>deleteCompany(b.dataset.eid,b.dataset.name)));
+}
+
+function openEditCompany(eid){
+  const c = companies.find(x=>x.EnterpriseId===eid);
+  if(!c) return;
+  showModal('編輯公司', `
+    <div class="form-group"><label>公司編號</label><input type="text" value="${c.EnterpriseId}" readonly></div>
+    <div class="modal-row">
+      <div class="form-group"><label>中文名稱</label><input type="text" id="editChName" value="${esc(c.EnterpriseChName||'')}"></div>
+      <div class="form-group"><label>英文名稱</label><input type="text" id="editEnName" value="${esc(c.EnterpriseEnName||'')}"></div>
+    </div>
+    <div class="modal-row">
+      <div class="form-group"><label>電話</label><input type="text" id="editPhone" value="${esc(c.Telphone||'')}"></div>
+      <div class="form-group"><label>郵遞區號</label><input type="text" id="editPostal" value="${esc(c.PostalCode||'')}"></div>
+    </div>
+    <div class="form-group"><label>地址</label><input type="text" id="editAddr" value="${esc(c.Address||'')}"></div>
+  `, async ()=>{
+    await apiFetch('vas/enterprise-data',{method:'POST',body:JSON.stringify({
+      BuildingNo:BUILDING_NO,EnterpriseId:eid,
+      EnterpriseChName:$('editChName').value.trim(),
+      EnterpriseEnName:$('editEnName').value.trim(),
+      Telphone:$('editPhone').value.trim(),
+      PostalCode:$('editPostal').value.trim(),
+      Address:$('editAddr').value.trim()
+    })});
+    showLoading();
+    const data = await apiFetch('vas/enterprise-data/query',{method:'POST',body:JSON.stringify({BuildingNo:BUILDING_NO})});
+    companies = (data.DataList||[]).filter(x=>x.EnterpriseId!=='00000000');
+    companies.forEach(x=>{ x.cardCount = '-'; });
+    renderCompanies();
+    loadCardCounts();
+    hideLoading();
+  });
+}
+
+function showAddCompany(){
+  showModal('新增公司', `
+    <div class="modal-row">
+      <div class="form-group"><label>公司編號 <span class="req">*</span></label><input type="text" id="newEid" placeholder="例：1101001"></div>
+      <div class="form-group"><label>郵遞區號</label><input type="text" id="newPostalCode" placeholder="例：407"></div>
+    </div>
+    <div class="modal-row">
+      <div class="form-group"><label>中文名稱 <span class="req">*</span></label><input type="text" id="newChName"></div>
+      <div class="form-group"><label>英文名稱</label><input type="text" id="newEnName"></div>
+    </div>
+    <div class="form-group"><label>電話</label><input type="text" id="newPhone"></div>
+    <div class="form-group"><label>地址</label><input type="text" id="newAddr"></div>
+  `, async ()=>{
+    const eid=$('newEid').value.trim(), ch=$('newChName').value.trim();
+    if(!eid||!ch){ alert('請填寫公司編號與中文名稱'); throw new Error('missing fields'); }
+    await apiFetch('vas/enterprise-data',{method:'POST',body:JSON.stringify({
+      BuildingNo:BUILDING_NO,EnterpriseId:eid,
+      EnterpriseChName:ch,EnterpriseEnName:$('newEnName').value.trim(),
+      Telphone:$('newPhone').value.trim(),PostalCode:$('newPostalCode').value.trim(),
+      Address:$('newAddr').value.trim()
+    })});
+    showLoading();
+    const data = await apiFetch('vas/enterprise-data/query',{method:'POST',body:JSON.stringify({BuildingNo:BUILDING_NO})});
+    companies = (data.DataList||[]).filter(x=>x.EnterpriseId!=='00000000');
+    companies.forEach(x=>{ x.cardCount = '-'; });
+    renderCompanies();
+    loadCardCounts();
+    hideLoading();
+  });
+}
+
+async function deleteCompany(eid,name){
+  if(!confirm(`確定刪除公司「${name}」？此操作無法復原。`)) return;
+  try{
+    await apiFetch('vas/enterprise-data',{method:'DELETE',body:JSON.stringify({BuildingNo:BUILDING_NO,EnterpriseId:eid})});
+    await loadCompanies();
+  } catch(e){ alert('刪除失敗：'+e.message); }
+}
+
+// ========== Cards ==========
+async function renderCards(){
+  const el=$('cardsContent'), eid=$('cardCompanySelect').value;
+  if(!eid){ el.innerHTML='<div class="empty-state">請先選擇公司</div>'; return; }
+  $('cardsLoading').classList.remove('hidden');
+  try{
+    const data=await apiFetch('vas/company-card/query',{method:'POST',body:JSON.stringify({BuildingNo:BUILDING_NO,EnterpriseId:eid})});
+    const cards=data.DataList||[];
+    if(!cards.length){ el.innerHTML='<div class="empty-state">此公司尚無卡片</div>'; $('cardsLoading').classList.add('hidden'); return; }
+    el.innerHTML=`<div class="table-wrap"><table>
+      <thead><tr><th>卡片號碼</th><th>員工姓名</th><th>備註</th><th>操作</th></tr></thead>
+      <tbody>${cards.map(c=>`<tr>
+        <td>${esc(c.CardNo)}</td><td>${esc(c.StaffName||'')}</td><td>${esc(c.Note||'')}</td>
+        <td style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm edit-card" data-cardno="${c.CardNo}" data-name="${esc(c.StaffName||'')}" data-note="${esc(c.Note||'')}">編輯</button>
+          <button class="btn btn-danger btn-sm delete-card" data-cardno="${c.CardNo}">刪除</button>
+        </td></tr>`).join('')}
+      </tbody></table></div>`;
+    el.querySelectorAll('.edit-card').forEach(b=>b.addEventListener('click',()=>openEditCard(b,eid)));
+    el.querySelectorAll('.delete-card').forEach(b=>b.addEventListener('click',()=>deleteCard(b.dataset.cardno,eid)));
+  } catch(e){ el.innerHTML='<div class="empty-state">載入失敗</div>'; }
+  $('cardsLoading').classList.add('hidden');
+}
+
+function openEditCard(btn,eid){
+  showModal('編輯卡片', `
+    <div class="form-group"><label>卡片號碼</label><input type="text" value="${btn.dataset.cardno}" readonly></div>
+    <div class="form-group"><label>員工姓名</label><input type="text" id="editCardName" value="${esc(btn.dataset.name)}"></div>
+    <div class="form-group"><label>備註</label><input type="text" id="editCardNote" value="${esc(btn.dataset.note)}"></div>
+  `, async ()=>{
+    await apiFetch('vas/company-card',{method:'POST',body:JSON.stringify({
+      BuildingNo:BUILDING_NO,EnterpriseId:eid,
+      DataList:[{CardNo:btn.dataset.cardno,StaffName:$('editCardName').value.trim(),Note:$('editCardNote').value.trim(),WorkingGroupId:"0"}]
+    })});
+    renderCards();
+  });
+}
+
+function showAddCard(){
+  const eid=$('cardCompanySelect').value;
+  if(!eid){ alert('請先選擇公司'); return; }
+  showModal('新增卡片', `
+    <div class="form-group"><label>卡片號碼 <span class="req">*</span></label><input type="text" id="newCardNo" placeholder="請輸入卡片號碼"></div>
+    <div class="form-group"><label>員工姓名</label><input type="text" id="newCardName"></div>
+    <div class="form-group"><label>備註</label><input type="text" id="newCardNote"></div>
+  `, async ()=>{
+    const no=$('newCardNo').value.trim();
+    if(!no){ alert('請輸入卡片號碼'); throw new Error('missing card no'); }
+    await apiFetch('vas/company-card',{method:'POST',body:JSON.stringify({
+      BuildingNo:BUILDING_NO,EnterpriseId:eid,
+      DataList:[{CardNo:no,StaffName:$('newCardName').value.trim(),Note:$('newCardNote').value.trim(),WorkingGroupId:"0"}]
+    })});
+    renderCards();
+  });
+}
+
+async function deleteCard(cardNo,eid){
+  if(!confirm('確定刪除此卡片？')) return;
+  try{
+    await apiFetch('vas/company-card',{method:'DELETE',body:JSON.stringify({BuildingNo:BUILDING_NO,EnterpriseId:eid,DataList:[{CardNo:cardNo}]})});
+    renderCards();
+  } catch(e){ alert('刪除失敗：'+e.message); }
+}
+
+// ========== Staff ==========
+async function renderStaff(){
+  const el=$('staffContent'), eid=$('staffCompanySelect').value;
+  if(!eid){ el.innerHTML='<div class="empty-state">請先選擇公司</div>'; return; }
+  $('staffLoading').classList.remove('hidden');
+  try{
+    const data=await apiFetch('vas/company-staff/query',{method:'POST',body:JSON.stringify({BuildingNo:BUILDING_NO,EnterpriseId:eid})});
+    const staff=(data.DataList||[]).filter(r=>r.EnterpriseId===eid);
+    if(!staff.length){ el.innerHTML='<div class="empty-state">此公司尚無人員</div>'; $('staffLoading').classList.add('hidden'); return; }
+    el.innerHTML=`<div class="table-wrap"><table>
+      <thead><tr><th>帳號（Email）</th><th>顯示名稱</th><th>公司ID</th><th>操作</th></tr></thead>
+      <tbody>${staff.map(s=>`<tr>
+        <td>${esc(s.username)}</td><td>${esc(s.display_name)}</td><td>${esc(s.EnterpriseId)}</td>
+        <td style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm edit-staff" data-username="${esc(s.username)}" data-display="${esc(s.display_name)}">編輯</button>
+          <button class="btn btn-danger btn-sm delete-staff" data-username="${esc(s.username)}">刪除</button>
+        </td></tr>`).join('')}
+      </tbody></table></div>`;
+    el.querySelectorAll('.edit-staff').forEach(b=>b.addEventListener('click',()=>openEditStaff(b,eid)));
+    el.querySelectorAll('.delete-staff').forEach(b=>b.addEventListener('click',()=>deleteStaff(b.dataset.username,eid)));
+  } catch(e){ el.innerHTML='<div class="empty-state">載入失敗</div>'; }
+  $('staffLoading').classList.add('hidden');
+}
+
+function openEditStaff(btn,eid){
+  showModal('編輯人員', `
+    <div class="form-group"><label>帳號</label><input type="text" value="${btn.dataset.username}" readonly></div>
+    <div class="form-group"><label>顯示名稱</label><input type="text" id="editStaffDisplay" value="${esc(btn.dataset.display)}"></div>
+    <div class="form-group"><label>目前密碼（如不換密碼請留空）</label><input type="password" id="editStaffCurPwd" placeholder="留空表示不更換密碼"></div>
+    <div class="form-group"><label>新密碼</label><input type="password" id="editStaffNewPwd" placeholder="留空表示不更換密碼"></div>
+  `, async ()=>{
+    const body={username:btn.dataset.username,display_name:$('editStaffDisplay').value.trim(),password:'',new_password:''};
+    const cur=$('editStaffCurPwd').value, nw=$('editStaffNewPwd').value;
+    if(cur&&nw){ body.password=cur; body.new_password=nw; }
+    await apiFetch('vas/company-staff',{method:'PUT',body:JSON.stringify(body)});
+    renderStaff();
+  });
+}
+
+async function deleteStaff(username,eid){
+  if(!confirm('確定刪除此人員？')) return;
+  try{
+    await apiFetch('vas/company-staff',{method:'DELETE',body:JSON.stringify({BuildingNo:BUILDING_NO,EnterpriseId:eid,username})});
+    renderStaff();
+  } catch(e){ alert('刪除失敗：'+e.message); }
+}
+
+function showAddStaff(){
+  const eid=$('staffCompanySelect').value;
+  if(!eid){ alert('請先選擇公司'); return; }
+  showModal('新增人員', `
+    <div class="form-group"><label>帳號（Email） <span class="req">*</span></label><input type="email" id="newStaffEmail" placeholder="email@example.com"></div>
+    <div class="form-group"><label>顯示名稱 <span class="req">*</span></label><input type="text" id="newStaffDisplay"></div>
+    <div class="form-group"><label>密碼 <span class="req">*</span></label><input type="password" id="newStaffPwd" placeholder="至少8碼"></div>
+  `, async ()=>{
+    const email=$('newStaffEmail').value.trim(), name=$('newStaffDisplay').value.trim(), pwd=$('newStaffPwd').value;
+    if(!email||!name||!pwd||pwd.length<8){ alert('請填寫所有必填欄位，密碼至少8碼'); throw new Error('missing fields'); }
+    await apiFetch('vas/company-staff',{method:'POST',body:JSON.stringify({BuildingNo:BUILDING_NO,EnterpriseId:eid,username:email,display_name:name,password:pwd})});
+    renderStaff();
+  });
+}
+
+// ========== Access Control ==========
+async function renderAccess(){
+  const el=$('accessContent'), eid=$('accessCompanySelect').value;
+  if(!eid){ el.innerHTML='<div class="empty-state">請先選擇公司</div>'; return; }
+  $('accessLoading').classList.remove('hidden');
+  try{
+    // Get ALL control groups
+    const allData=await apiFetch('vas/area-control-group',{method:'POST',body:JSON.stringify({BuildingNo:BUILDING_NO})});
+    const allGroups=allData.DataList||[];
+    // Get ASSIGNED groups for this company
+    const assignedData=await apiFetch('vas/company-access-control',{method:'POST',body:JSON.stringify({BuildingNo:BUILDING_NO,EnterpriseId:eid})});
+    const assignedGroups=assignedData.DataList||[];
+    const assignedIds=new Set(assignedGroups.map(g=>g.ControlGroupId));
+
+    el.innerHTML=`<div class="table-wrap"><table>
+      <thead><tr><th style="width:40px"></th><th>群組 ID</th><th>群組名稱</th><th>類型</th></tr></thead>
+      <tbody>${allGroups.map(g=>`<tr>
+        <td><input type="checkbox" class="access-check" value="${g.ControlGroupId}" ${assignedIds.has(g.ControlGroupId)?'checked':''}></td>
+        <td>${g.ControlGroupId}</td>
+        <td>${esc(g.ControlGroupName)}</td>
+        <td>${esc(g.GroupTypeName||'')}</td>
+      </tr>`).join('')}
+      </tbody></table></div>
+      <div style="text-align:right;margin-top:16px">
+        <button class="btn btn-primary btn-sm" id="saveAccessBtn">💾 儲存門禁設定</button>
+      </div>`;
+    $('saveAccessBtn').addEventListener('click',async()=>{
+      const selected=Array.from(el.querySelectorAll('.access-check:checked')).map(cb=>cb.value);
+      const btn=$('saveAccessBtn'); btn.disabled=true; btn.innerHTML='儲存中...';
+      try{
+        await apiFetch('vas/company-access-control',{method:'PUT',body:JSON.stringify({
+          BuildingNo:BUILDING_NO,EnterpriseId:eid,
+          WorkingGroupId:"0",WorkingGroupName:"default",ControlGroupIdList:selected
+        })});
+        renderAccess();
+      } catch(e){ alert('儲存失敗：'+e.message); btn.disabled=false; btn.innerHTML='💾 儲存門禁設定'; }
+    });
+  } catch(e){ el.innerHTML='<div class="empty-state">載入失敗</div>'; }
+  $('accessLoading').classList.add('hidden');
+}
+
+// ========== Events ==========
+$('addCompanyBtn').addEventListener('click',showAddCompany);
+$('addCardBtn').addEventListener('click',showAddCard);
+$('addStaffBtn').addEventListener('click',showAddStaff);
+$('cardCompanySelect').addEventListener('change',renderCards);
+$('staffCompanySelect').addEventListener('change',renderStaff);
+$('accessCompanySelect').addEventListener('change',renderAccess);
+
+// ========== Modal ==========
+function showModal(title, bodyHtml, onSave){
+  const existing=$('modalOverlay'); if(existing) existing.remove();
+  const div=document.createElement('div');
+  div.className='modal-overlay'; div.id='modalOverlay';
+  div.innerHTML=`<div class="modal">
+    <h3>${title}</h3>${bodyHtml}
+    <div class="modal-footer">
+      <button class="btn btn-ghost modal-cancel">取消</button>
+      <button class="btn btn-primary modal-save">儲存</button>
+    </div>
+  </div>`;
+  document.body.appendChild(div);
+  div.addEventListener('click',e=>{ if(e.target===div) div.remove(); });
+  div.querySelector('.modal-cancel').addEventListener('click',()=>div.remove());
+  div.querySelector('.modal-save').addEventListener('click',async()=>{
+    const btn=div.querySelector('.modal-save');
+    btn.disabled=true; btn.textContent='儲存中...';
+    try{ await onSave(); div.remove(); } catch(e){ alert(e.message); }
+    btn.disabled=false; btn.textContent='儲存';
+  });
+}
+
+// Auto-login
+$('password').value && setTimeout(()=>$('loginBtn').click(),200);
+
+console.log('✅ 後台管理系統已載入');
+</script>
+</body>
+</html>
